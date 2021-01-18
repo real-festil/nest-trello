@@ -1,34 +1,30 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { User } from '../users/users.entity';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class AuthService {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
+  ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
-    const user = await User.findOne({ email });
-    if (user && user.password === password) {
+    const user = await this.usersRepository.findOne({ email });
+    const isValid = await bcrypt.compare(password, user.password);
+    if (user && isValid) {
       return user;
     }
     return null;
   }
 
-  async addUser(username: string, email: string, password: string) {
-    const isExist = await User.findOne({ email });
-
-    if (isExist) {
-      return 'User already exists';
-    }
-    User.insert({ username, email, password });
-    return 'User successfully created';
-  }
-
-  async login(user: any) {
-    const fullUserData = await User.findOne({ email: user.email });
-    const payload = { sub: fullUserData.id, email: fullUserData.email };
+  async login(user: User) {
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: this.jwtService.sign({ sub: user.id }),
     };
   }
 }

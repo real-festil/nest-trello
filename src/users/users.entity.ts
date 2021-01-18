@@ -18,7 +18,7 @@ export class User extends BaseEntity {
   @Column({ type: 'varchar', length: 50, unique: true })
   email: string;
 
-  @Column({ type: 'varchar', length: 30 })
+  @Column({ type: 'varchar', length: 200 })
   password: string;
 
   @OneToMany(() => ColumnEntity, (columns) => columns.user)

@@ -1,11 +1,36 @@
-import { Body, Controller, Get, Param, Patch, Delete } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Delete,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { UserService } from './users.service';
 import { UpdateUserDto } from './users.dto';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { RegisterDto } from 'src/auth/auth.dto';
+import { Public } from 'src/decorators/public.decorator';
+import { UserExistGuard } from 'src/guards/user-exist.guard';
 
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @ApiTags('Auth')
+  @ApiOperation({ summary: 'Register new user' })
+  @Public()
+  @UseGuards(UserExistGuard)
+  @Post('/register')
+  async addUser(@Body() registerDto: RegisterDto) {
+    const { username, email, password } = registerDto;
+
+    const res = await this.userService.addUser(username, email, password);
+
+    return res;
+  }
 
   @ApiTags('Users')
   @ApiOperation({ summary: 'Get all users' })

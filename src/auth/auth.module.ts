@@ -8,9 +8,12 @@ import { jwtConstants } from './constants';
 import { AuthController } from './auth.controller';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { APP_GUARD } from '@nestjs/core';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from '../users/users.entity';
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([User]),
     PassportModule,
     JwtModule.register({
       secret: jwtConstants.secret,
