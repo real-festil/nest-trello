@@ -15,12 +15,12 @@ export class CardsService {
 
   async addCard(columnId: string, name: string, description?: string) {
     const column = await this.columnsRepository.findOne(columnId);
-    if (column === undefined) {
-      return false;
-    }
-
-    this.cardsRepository.insert({ column, name, description });
-    return 'success';
+    const res = await this.cardsRepository.insert({
+      column,
+      name,
+      description,
+    });
+    return { id: res.identifiers[0].id, name, description };
   }
 
   getCards(columnId: string) {

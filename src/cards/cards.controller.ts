@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  NotFoundException,
   Param,
   Patch,
   Post,
@@ -13,8 +12,10 @@ import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { AddCardDto, UpdateCardDto } from './cards.dto';
 import { CardsService } from './cards.service';
 import { CardOwnerGuard } from '../guards/card-owner.guard';
+import { ColumnNotExistsGuard } from 'src/guards/column-not-exist.guard';
 
 @Controller('users/:userId/columns/:columnId/cards')
+@UseGuards(ColumnNotExistsGuard)
 export class CardsController {
   constructor(private readonly cardsService: CardsService) {}
 
@@ -30,10 +31,7 @@ export class CardsController {
       addCardDto.name,
       addCardDto.description,
     );
-    if (!res) {
-      throw new NotFoundException();
-    }
-    return 'Successfully added';
+    return res;
   }
 
   @ApiTags('Cards')

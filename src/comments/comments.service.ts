@@ -15,12 +15,8 @@ export class CommentsService {
 
   async addComment(cardId: string, text: string) {
     const card = await this.cardsRepository.findOne(cardId);
-    if (card === undefined) {
-      return false;
-    }
-
-    this.commentsRepository.insert({ card, text });
-    return 'success';
+    const res = await this.commentsRepository.insert({ card, text });
+    return { id: res.identifiers[0].id, text };
   }
 
   getComments(cardId: string) {

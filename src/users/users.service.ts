@@ -16,7 +16,7 @@ export class UserService {
     const res = await this.usersRepository.insert({
       username,
       email,
-      password: password,
+      password: hashedPassword,
     });
     return { id: res.identifiers[0].id, username, email };
   }

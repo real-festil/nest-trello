@@ -9,7 +9,7 @@ import { User } from 'src/users/users.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
-export class UserExistGuard implements CanActivate {
+export class UserNotExistsGuard implements CanActivate {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
@@ -17,10 +17,10 @@ export class UserExistGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext) {
     const req = context.switchToHttp().getRequest();
-    const user = await this.usersRepository.findOne({ email: req.body.email });
+    const user = await this.usersRepository.findOne({ id: req.params.userId });
 
-    if (user) {
-      throw new ForbiddenException('User with this email already exists');
+    if (!user) {
+      throw new ForbiddenException('User with this id not exists');
     }
     return true;
   }

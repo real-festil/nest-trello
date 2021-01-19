@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  NotFoundException,
   Param,
   Patch,
   Post,
@@ -13,8 +12,10 @@ import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { AddCommentDto, UpdateCommentDto } from './comments.dto';
 import { CommentsService } from './comments.service';
 import { CommentOwnerGuard } from '../guards/comment-owner.guard';
+import { CardNotExistsGuard } from 'src/guards/card-not-exist.guard';
 
 @Controller('users/:userId/columns/:columnId/cards/:cardId/comments')
+@UseGuards(CardNotExistsGuard)
 export class CommentsController {
   constructor(private readonly commentService: CommentsService) {}
 
@@ -29,10 +30,7 @@ export class CommentsController {
       cardId,
       addCommentDto.text,
     );
-    if (!res) {
-      throw new NotFoundException();
-    }
-    return 'Successfully added';
+    return res;
   }
 
   @ApiTags('Comments')

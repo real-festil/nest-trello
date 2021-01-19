@@ -15,13 +15,8 @@ export class ColumnsService {
 
   async addColumn(userId: string, name: string) {
     const user = await this.usersRepository.findOne(userId);
-
-    if (user === undefined) {
-      return false;
-    }
-
-    this.columnsRepository.insert({ name, user });
-    return true;
+    const res = await this.columnsRepository.insert({ name, user });
+    return { id: res.identifiers[0].id, name };
   }
 
   getColumns(userId: string) {

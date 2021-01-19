@@ -1,20 +1,13 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Post,
-  Patch,
-  NotFoundException,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, Patch } from '@nestjs/common';
 import { Param, UseGuards } from '@nestjs/common';
 import { UserOwnerGuard } from '../guards/user-owner.guard';
 import { ColumnsService } from './columns.service';
 import { ColumnOwnerGuard } from '../guards/column-owner.guard';
 import { AddColumnDto, UpdateColumnDto } from './columns.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { UserNotExistsGuard } from 'src/guards/user-not-exist.guard';
 
-@UseGuards(new UserOwnerGuard())
+@UseGuards(new UserOwnerGuard(), UserNotExistsGuard)
 @Controller('users/:userId/columns')
 export class ColumnsController {
   constructor(private readonly columnsService: ColumnsService) {}
@@ -28,16 +21,12 @@ export class ColumnsController {
   ) {
     const res = await this.columnsService.addColumn(userId, addColumnDto.name);
 
-    if (!res) {
-      throw new NotFoundException();
-    }
-
-    return 'Successfully added';
+    return res;
   }
 
   @ApiTags('Columns')
   @ApiOperation({ summary: 'Delete column' })
-  @UseGuards(new ColumnOwnerGuard())
+  @UseGuards(new ColumnOwnerGuard(), UserNotExistsGuard)
   @Delete(':columnId')
   async deleteColumn(@Param('columnId') columnId: string) {
     await this.columnsService.deleteColumn(columnId);
