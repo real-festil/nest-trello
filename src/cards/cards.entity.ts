@@ -1,5 +1,4 @@
 import {
-  BaseEntity,
   Column,
   Entity,
   ManyToOne,
@@ -10,9 +9,9 @@ import { ColumnEntity } from '../columns/columns.entity';
 import { CommentEntity } from '../comments/comments.entity';
 
 @Entity('cards')
-export class CardEntity extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+export class CardEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ type: 'varchar', length: 50 })
   name: string;

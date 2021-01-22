@@ -1,20 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { CommentEntity } from './comments.entity';
-import { CardEntity } from '../cards/cards.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { CardsService } from 'src/cards/cards.service';
 
 @Injectable()
 export class CommentsService {
   constructor(
     @InjectRepository(CommentEntity)
     private commentsRepository: Repository<CommentEntity>,
-    @InjectRepository(CardEntity)
-    private cardsRepository: Repository<CardEntity>,
+    private cardsService: CardsService,
   ) {}
 
   async addComment(cardId: string, text: string) {
-    const card = await this.cardsRepository.findOne(cardId);
+    const card = await this.cardsService.getSingleCard(cardId);
     const res = await this.commentsRepository.insert({ card, text });
     return { id: res.identifiers[0].id, text };
   }
@@ -29,11 +28,11 @@ export class CommentsService {
 
   updateComment(commentID: string, text) {
     if (text) {
-      this.commentsRepository.update({ id: +commentID }, { text });
+      this.commentsRepository.update({ id: commentID }, { text });
     }
   }
 
   deleteComment(commentID: string) {
-    this.commentsRepository.delete({ id: +commentID });
+    this.commentsRepository.delete({ id: commentID });
   }
 }

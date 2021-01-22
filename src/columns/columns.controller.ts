@@ -1,14 +1,14 @@
 import { Body, Controller, Delete, Get, Post, Patch } from '@nestjs/common';
 import { Param, UseGuards } from '@nestjs/common';
-import { UserOwnerGuard } from '../guards/user-owner.guard';
+import { UserNotExistsGuard } from '../users/users.guard';
 import { ColumnsService } from './columns.service';
-import { ColumnOwnerGuard } from '../guards/column-owner.guard';
+import { ColumnOwnerGuard } from './columns.guard';
 import { AddColumnDto, UpdateColumnDto } from './columns.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { UserNotExistsGuard } from 'src/guards/user-not-exist.guard';
+import { CurrentUser } from 'src/decorators/current-user.decorator';
 
-@UseGuards(new UserOwnerGuard(), UserNotExistsGuard)
-@Controller('users/:userId/columns')
+@UseGuards(UserNotExistsGuard)
+@Controller('/columns')
 export class ColumnsController {
   constructor(private readonly columnsService: ColumnsService) {}
 
@@ -16,52 +16,50 @@ export class ColumnsController {
   @ApiOperation({ summary: 'Add column' })
   @Post()
   async addColumn(
-    @Param('userId') userId: string,
+    @CurrentUser('id') userId,
     @Body() addColumnDto: AddColumnDto,
   ) {
-    const res = await this.columnsService.addColumn(userId, addColumnDto.name);
-
-    return res;
+    return await this.columnsService.addColumn(userId, addColumnDto.name);
   }
 
   @ApiTags('Columns')
   @ApiOperation({ summary: 'Delete column' })
-  @UseGuards(new ColumnOwnerGuard(), UserNotExistsGuard)
+  @UseGuards(ColumnOwnerGuard, UserNotExistsGuard)
   @Delete(':columnId')
   async deleteColumn(@Param('columnId') columnId: string) {
-    await this.columnsService.deleteColumn(columnId);
-    return 'Successfully deleted';
+    return await this.columnsService.deleteColumn(columnId);
   }
 
   @ApiTags('Columns')
   @ApiOperation({ summary: 'Get all columns' })
   @Get()
   async getColumns(@Param('userId') userId: string) {
-    const res = await this.columnsService.getColumns(userId);
-    return res;
+    return await this.columnsService.getColumns(userId);
   }
 
   @ApiTags('Columns')
   @ApiOperation({ summary: 'Get single column' })
-  @UseGuards(new ColumnOwnerGuard())
+  @UseGuards(ColumnOwnerGuard)
   @Get(':columnId')
   async getSingleColumn(
     @Param('columnId')
     columnId: string,
   ) {
-    const res = await this.columnsService.getSingleColumn(columnId);
-    return res;
+    return await this.columnsService.getSingleColumn(columnId);
   }
 
   @ApiTags('Columns')
   @ApiOperation({ summary: 'Update column' })
-  @UseGuards(new ColumnOwnerGuard())
+  @UseGuards(ColumnOwnerGuard)
   @Patch(':columnId')
   async updateColumn(
-    @Param('columnId') columnId: string,
+    @Param('columnId')
+    columnId: string,
     @Body() updateColumnDto: UpdateColumnDto,
   ) {
-    await this.columnsService.updateColumn(columnId, updateColumnDto.name);
-    return 'Successfully updated';
+    return await this.columnsService.updateColumn(
+      columnId,
+      updateColumnDto.name,
+    );
   }
 }

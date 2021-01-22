@@ -11,10 +11,10 @@ import {
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { AddCardDto, UpdateCardDto } from './cards.dto';
 import { CardsService } from './cards.service';
-import { CardOwnerGuard } from '../guards/card-owner.guard';
-import { ColumnNotExistsGuard } from 'src/guards/column-not-exist.guard';
+import { CardOwnerGuard } from './cards.guard';
+import { ColumnNotExistsGuard } from '../columns/columns.guard';
 
-@Controller('users/:userId/columns/:columnId/cards')
+@Controller('columns/:columnId/cards')
 @UseGuards(ColumnNotExistsGuard)
 export class CardsController {
   constructor(private readonly cardsService: CardsService) {}
@@ -36,7 +36,7 @@ export class CardsController {
 
   @ApiTags('Cards')
   @ApiOperation({ summary: 'Delete card' })
-  @UseGuards(new CardOwnerGuard())
+  @UseGuards(CardOwnerGuard)
   @Delete(':cardId')
   async deleteCard(@Param('cardId') cardId: string) {
     await this.cardsService.deleteCard(cardId);
@@ -53,7 +53,7 @@ export class CardsController {
 
   @ApiTags('Cards')
   @ApiOperation({ summary: 'Get single card' })
-  @UseGuards(new CardOwnerGuard())
+  @UseGuards(CardOwnerGuard)
   @Get(':cardId')
   async getSingleCard(
     @Param('cardId')
@@ -65,7 +65,7 @@ export class CardsController {
 
   @ApiTags('Cards')
   @ApiOperation({ summary: 'Update card' })
-  @UseGuards(new CardOwnerGuard())
+  @UseGuards(CardOwnerGuard)
   @Patch(':cardId')
   async updateCard(
     @Param('cardId') cardId: string,

@@ -1,16 +1,10 @@
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { CardEntity } from '../cards/cards.entity';
 
 @Entity('comments')
-export class CommentEntity extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+export class CommentEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ type: 'varchar', length: 300 })
   text: string;

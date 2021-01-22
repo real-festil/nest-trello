@@ -11,10 +11,10 @@ import {
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { AddCommentDto, UpdateCommentDto } from './comments.dto';
 import { CommentsService } from './comments.service';
-import { CommentOwnerGuard } from '../guards/comment-owner.guard';
-import { CardNotExistsGuard } from 'src/guards/card-not-exist.guard';
+import { CommentOwnerGuard } from './comments.guard';
+import { CardNotExistsGuard } from '../cards/cards.guard';
 
-@Controller('users/:userId/columns/:columnId/cards/:cardId/comments')
+@Controller('/columns/:columnId/cards/:cardId/comments')
 @UseGuards(CardNotExistsGuard)
 export class CommentsController {
   constructor(private readonly commentService: CommentsService) {}
@@ -35,7 +35,7 @@ export class CommentsController {
 
   @ApiTags('Comments')
   @ApiOperation({ summary: 'Delete comment' })
-  @UseGuards(new CommentOwnerGuard())
+  @UseGuards(CommentOwnerGuard)
   @Delete(':commentId')
   async deleteComment(@Param('commentId') commentId: string) {
     await this.commentService.deleteComment(commentId);
@@ -52,7 +52,7 @@ export class CommentsController {
 
   @ApiTags('Comments')
   @ApiOperation({ summary: 'Get single comment' })
-  @UseGuards(new CommentOwnerGuard())
+  @UseGuards(CommentOwnerGuard)
   @Get(':commentId')
   async getSingleComment(
     @Param('commentId')
@@ -64,7 +64,7 @@ export class CommentsController {
 
   @ApiTags('Comments')
   @ApiOperation({ summary: 'Update comment' })
-  @UseGuards(new CommentOwnerGuard())
+  @UseGuards(CommentOwnerGuard)
   @Patch(':commentId')
   async updateCard(
     @Param('commentId') commentId: string,

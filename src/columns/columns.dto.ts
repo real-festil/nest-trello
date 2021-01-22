@@ -1,4 +1,4 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class AddColumnDto {
@@ -15,8 +15,9 @@ export class UpdateColumnDto {
   @ApiProperty({
     type: 'string',
     description: 'Name',
-    required: true,
+    required: false,
   })
   @IsNotEmpty()
+  @IsOptional()
   name: string;
 }

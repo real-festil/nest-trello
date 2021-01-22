@@ -1,39 +1,40 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, Scope } from '@nestjs/common';
 import { ColumnEntity } from './columns.entity';
-import { User } from '../users/users.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { UserService } from 'src/users/users.service';
+import { REQUEST } from '@nestjs/core';
+import { Request } from 'express';
 
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export class ColumnsService {
   constructor(
     @InjectRepository(ColumnEntity)
     private columnsRepository: Repository<ColumnEntity>,
-    @InjectRepository(User)
-    private usersRepository: Repository<User>,
+    private userService: UserService,
+    @Inject(REQUEST) private readonly request: Request,
   ) {}
 
   async addColumn(userId: string, name: string) {
-    const user = await this.usersRepository.findOne(userId);
-    const res = await this.columnsRepository.insert({ name, user });
-    return { id: res.identifiers[0].id, name };
+    const user = await this.userService.getSingleUser(userId);
+    return await this.columnsRepository.save({ name, user });
   }
 
-  getColumns(userId: string) {
-    return this.columnsRepository.find({ where: { user: { id: userId } } });
+  async getColumns(userId: string) {
+    return await this.columnsRepository.find({
+      where: { user: { id: userId } },
+    });
   }
 
-  getSingleColumn(columnId: string) {
-    return this.columnsRepository.findOne(columnId);
+  async getSingleColumn(columnId: string) {
+    return await this.columnsRepository.findOne(columnId);
   }
 
-  updateColumn(columnId: string, name: string) {
-    if (name) {
-      this.columnsRepository.update({ id: +columnId }, { name });
-    }
+  async updateColumn(columnId: string, name: string) {
+    return await this.columnsRepository.save({ id: columnId, name });
   }
 
-  deleteColumn(columnId: string) {
-    this.columnsRepository.delete({ id: +columnId });
+  async deleteColumn(columnId: string) {
+    return await this.columnsRepository.delete({ id: columnId });
   }
 }

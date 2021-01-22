@@ -1,20 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { CardEntity } from './cards.entity';
-import { ColumnEntity } from '../columns/columns.entity';
+import { ColumnsService } from '../columns/columns.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class CardsService {
   constructor(
-    @InjectRepository(ColumnEntity)
-    private columnsRepository: Repository<ColumnEntity>,
     @InjectRepository(CardEntity)
     private cardsRepository: Repository<CardEntity>,
+    private columnsService: ColumnsService,
   ) {}
 
   async addCard(columnId: string, name: string, description?: string) {
-    const column = await this.columnsRepository.findOne(columnId);
+    const column = await this.columnsService.getSingleColumn(columnId);
     const res = await this.cardsRepository.insert({
       column,
       name,
@@ -33,14 +32,14 @@ export class CardsService {
 
   updateCard(cardId: string, name?: string, description?: string) {
     if (name) {
-      this.cardsRepository.update({ id: +cardId }, { name });
+      this.cardsRepository.update({ id: cardId }, { name });
     }
     if (description) {
-      this.cardsRepository.update({ id: +cardId }, { description });
+      this.cardsRepository.update({ id: cardId }, { description });
     }
   }
 
   deleteCard(cardId: string) {
-    this.cardsRepository.delete({ id: +cardId });
+    this.cardsRepository.delete({ id: cardId });
   }
 }
