@@ -20,6 +20,7 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('/login')
   loginUser(@Request() req) {
+    console.log('hello', req);
     return this.authService.login(req.user);
   }
 
@@ -29,6 +30,7 @@ export class AuthController {
   @UseGuards(UserExistGuard)
   @Post('/register')
   async addUser(@Body() registerDto: RegisterDto) {
+    console.log(registerDto, 'registerDto');
     const res = await this.authService.register(registerDto);
 
     return res;
